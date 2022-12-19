@@ -1,51 +1,17 @@
 import json
 
 from django.http import HttpResponse, JsonResponse
-from django.shortcuts import render
 from rest_framework import generics, status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.parsers import JSONParser
 from rest_framework.views import APIView
 
-from .models import Customer, Eventos
-from .serializers import CustomerSerializer, Eventos_serializer
-from rest_framework.permissions import AllowAny, IsAuthenticated
-from rest_framework import viewsets
+from .models import Eventos, Cia, Empleados, Areas
+from .serializers import Eventos_serializer, Cias_serializer, Empleados_serializer, Areas_serializer
+from rest_framework.permissions import AllowAny
 from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token
 from django.contrib.auth import authenticate
-
-
-class CustomerAllViewSet(generics.ListAPIView):
-    queryset = Customer.objects.all()
-    serializer_class = CustomerSerializer
-    permission_classes = (AllowAny,)
-
-
-class CustomerCreate(generics.CreateAPIView):
-    queryset = Customer.objects.all()
-    serializer_class = CustomerSerializer
-    permission_classes = (AllowAny,)
-
-
-class CustomerDelete(generics.DestroyAPIView):
-    queryset = Customer.objects.all()
-    serializer_class = CustomerSerializer
-    permission_classes = (AllowAny,)
-    lookup_field = "customer_id"
-
-
-class CustomerUpdate(generics.UpdateAPIView):
-    queryset = Customer.objects.all()
-    serializer_class = CustomerSerializer
-    permission_classes = (AllowAny,)
-    lookup_field = "customer_id"
-
-
-class CustomerFull(viewsets.ModelViewSet):
-    queryset = Customer.objects.all()
-    serializer_class = CustomerSerializer
-    permission_classes = (IsAuthenticated,)
 
 
 class RegistrarUsuario(generics.CreateAPIView):
@@ -138,3 +104,30 @@ def eventosdetail(request, pk):
 
     except Eventos.DoesNotExist:
         return JsonResponse({'message': 'El Codigo del Evento Not Found'}, status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['GET', 'POST', 'DELETE'])
+@permission_classes([AllowAny])
+def ciasfull(request):
+    if request.method == 'GET':
+        cias = Cia.objects.all()
+    cias_serializer = Cias_serializer(cias, many=True)
+    return JsonResponse(cias_serializer.data, safe=False)
+
+
+@api_view(['GET', 'POST', 'DELETE'])
+@permission_classes([AllowAny])
+def areasfull(request):
+    if request.method == 'GET':
+        areas = Areas.objects.all()
+    areas_serializer = Areas_serializer(areas, many=True)
+    return JsonResponse(areas_serializer.data, safe=False)
+
+
+@api_view(['GET', 'POST', 'DELETE'])
+@permission_classes([AllowAny])
+def empleadosfull(request):
+    if request.method == 'GET':
+        empleados = Empleados.objects.all()
+    empleados_serializer = Empleados_serializer(empleados, many=True)
+    return JsonResponse(empleados_serializer.data, safe=False)
